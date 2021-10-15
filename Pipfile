@@ -12,6 +12,7 @@ djangorestframework = "*"
 inflection = "*"
 factory-boy = "==2.11.1"
 pytest-django = "*"
+django-money = "==2.1"
 
 [dev-packages]
 autopep8 = "*"
