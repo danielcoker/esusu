@@ -21,3 +21,22 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.token = user.generate_jwt_token()
 
         return user
+
+
+class LoginSerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    first_name = serializers.ReadOnlyField()
+    last_name = serializers.ReadOnlyField()
+    email = serializers.CharField(max_length=255, required=True)
+    password = serializers.CharField(
+        max_length=128, write_only=True, required=True)
+    token = serializers.CharField(max_length=255, read_only=True)
+    created_at = serializers.ReadOnlyField()
+
+    def validate(self, data):
+        authenticate_kwargs = {
+            'email': data['email'],
+            'password': data['password']
+        }
+
+        return login(**authenticate_kwargs)

@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 
 from base.mixins import SuccessMessageMixin
 
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer, LoginSerializer
 
 
 class AuthViewSet(SuccessMessageMixin, ViewSet):
@@ -19,5 +19,14 @@ class AuthViewSet(SuccessMessageMixin, ViewSet):
         serializer.save()
 
         self.success_message = 'User registered successfully.'
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False)
+    def login(self, request, **kwargs):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        self.success_message = 'User logged in successfully.'
 
         return Response(serializer.data, status=status.HTTP_200_OK)
