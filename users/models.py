@@ -16,7 +16,6 @@ class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, email, password=None):
         """
         Create and return a user with a first_name, last_name, email, and password.
-        :first_name string Firtname
         """
         if first_name is None:
             raise TypeError('User must have a first name.')
