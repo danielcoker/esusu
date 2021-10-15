@@ -20,7 +20,7 @@ class AuthViewSet(SuccessMessageMixin, ViewSet):
 
         self.success_message = 'User registered successfully.'
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(methods=['POST'], detail=False)
     def login(self, request, **kwargs):
