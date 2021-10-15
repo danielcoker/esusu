@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'base',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -144,3 +145,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer'),
 }
+# The model to use to represent a user.
+# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-user-model
+
+AUTH_USER_MODEL = 'users.User'
