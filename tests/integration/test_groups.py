@@ -21,6 +21,15 @@ def test_retrieve_group_by_id(client):
     assert response.status_code == 200
 
 
+def test_retrieve_group_by_token(client):
+    group = f.GroupFactory()
+    url = reverse('groups-token', kwargs={'token': group.token})
+
+    response = client.get(url)
+
+    assert response.status_code == 200
+
+
 def test_retrieve_by_non_existent_group_id(client):
     url = reverse('groups-detail', kwargs={'pk': randint(1, 100)})
 

@@ -2,6 +2,7 @@ import secrets
 
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
 from rest_framework.viewsets import ModelViewSet
@@ -33,3 +34,16 @@ class GroupViewSet(SuccessMessageMixin, ModelViewSet):
             qs = qs.filter(is_searchable=True)
 
         return qs
+
+    def retrieve(self, request, *args, **kwargs):
+        if self.action == 'token':
+            self.lookup_field = 'token'
+
+        self.object = get_object_or_404(self.get_queryset(), **kwargs)
+
+        serializer = self.get_serializer(self.object)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False, url_path='token/(?P<token>[^/.]+)')
+    def token(self, request, token, pk=None):
+        return self.retrieve(request, token=token)
