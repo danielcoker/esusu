@@ -55,6 +55,21 @@ def test_create_group(client):
     assert response.status_code == 201
 
 
+def test_search_groups(client):
+    group3 = f.GroupFactory(name='esusu group 3', token=token_hex(10).upper())
+    group2 = f.GroupFactory(token=token_hex(10).upper())
+    group1 = f.GroupFactory(
+        name='esusu group 1', token=token_hex(10).upper(), is_searchable=False)
+
+    url = f"{reverse('groups-list')}?search=esusu"
+
+    response = client.get(url)
+    response_data = json.loads(response.content)['data']
+
+    assert response.status_code == 200
+    assert len(response_data) == 1
+
+
 def test_list_groups(client):
     group3 = f.GroupFactory(token=token_hex(10).upper())
     group2 = f.GroupFactory(token=token_hex(10).upper())
