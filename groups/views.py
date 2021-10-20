@@ -14,7 +14,7 @@ from base.mixins import SuccessMessageMixin
 from base.permissions import IsOwnerOrReadOnly
 from users.models import User
 
-from .models import Group
+from .models import Group, Membership
 from .serializers import GroupSerializer, MembershipSerializer, MembershipBulkSerializer
 from . import services
 
@@ -54,6 +54,18 @@ class GroupViewSet(SuccessMessageMixin, ModelViewSet):
 
 
 class MembershipViewSet(SuccessMessageMixin, ModelViewSet):
+    serializer_class = MembershipSerializer
+    queryset = Membership.objects.all()
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        if self.action == 'list':
+            group = self.request.query_params.get('group')
+            qs = qs.filter(group=group)
+
+        return qs
+
     @action(methods=['POST'], detail=False)
     def bulk_create(self, request, **kwargs):
         serializer = MembershipBulkSerializer(data=request.data)
