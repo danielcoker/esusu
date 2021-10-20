@@ -42,6 +42,9 @@ class Membership(models.Model):
     created_at = models.DateField(
         auto_now_add=True, verbose_name=_('created at'))
 
+    class Meta:
+        unique_together = ('user', 'group',)
+
     def clean(self):
         memberships = Membership.objects.filter(
             user=self.user, group=self.group)
