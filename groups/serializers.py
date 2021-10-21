@@ -1,6 +1,9 @@
-from django.db.models import fields
-from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
 
+from rest_framework import serializers
+from rest_framework.exceptions import NotFound
+
+from users.models import User
 from users.serializers import UserSerializer
 
 from .models import Group, Membership
@@ -16,12 +19,29 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class MembershipSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True)
-    group = GroupSerializer(required=True)
+    full_name = serializers.SerializerMethodField()
+    is_owner = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    group_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Membership
-        fields = ('user', 'group',)
+        fields = ('id', 'full_name', 'email', 'group_name', 'is_owner',
+                  'is_admin', 'group', 'user', 'created_at')
+        read_only_fields = ('user', 'is_admin', 'is_owner', 'full_name',)
+
+    def get_full_name(self, obj):
+        return obj.user.get_full_name() if obj and obj.user else ''
+
+    def get_email(self, obj):
+        return obj.user.email if obj and obj.user else ''
+
+    def get_group_name(self, obj):
+        return obj.group.name if obj and obj.group else ''
+
+    def get_is_owner(self, obj):
+        return (obj and obj.user_id and obj.group_id and obj.group.owner_id and
+                obj.user_id == obj.group.owner_id)
 
 
 class _MembershipBulkSerializer(serializers.Serializer):
