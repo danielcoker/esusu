@@ -59,6 +59,7 @@ class GroupViewSet(SuccessMessageMixin, ModelViewSet):
 class MembershipViewSet(SuccessMessageMixin, ModelViewSet):
     serializer_class = MembershipSerializer
     queryset = Membership.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         qs = super().get_queryset()
