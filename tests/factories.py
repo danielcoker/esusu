@@ -39,4 +39,4 @@ class MembershipFactory(Factory):
 
     user = factory.SubFactory('tests.factories.UserFactory')
     group = factory.SubFactory('tests.factories.GroupFactory')
-    is_admin = True
+    is_admin = False
