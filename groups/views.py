@@ -1,7 +1,11 @@
 import secrets
 
+from django.db import IntegrityError
+from django.utils.translation import gettext_lazy as _
+
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
@@ -12,7 +16,6 @@ from django_pglocks import advisory_lock
 
 from base.mixins import SuccessMessageMixin
 from base.permissions import IsOwnerOrReadOnly
-from users.models import User
 
 from .models import Group, Membership
 from .serializers import GroupSerializer, MembershipSerializer, MembershipBulkSerializer
@@ -65,6 +68,13 @@ class MembershipViewSet(SuccessMessageMixin, ModelViewSet):
             qs = qs.filter(group=group)
 
         return qs
+
+    def perform_create(self, serializer):
+        try:
+            serializer.save(user=self.request.user)
+        except IntegrityError:
+            raise PermissionDenied(
+                _('This user is already a member of this group.'))
 
     @action(methods=['POST'], detail=False)
     def bulk_create(self, request, **kwargs):
