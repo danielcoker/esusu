@@ -44,3 +44,4 @@ class Membership(models.Model):
 
     class Meta:
         unique_together = ('user', 'group',)
+        ordering = ['-created_at']
