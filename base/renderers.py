@@ -28,8 +28,9 @@ class JSONRenderer(renderers.JSONRenderer):
         if not success_message and action and resource_name:
             success_message = f'{resource_name} {action} successfully.'
 
-        # If the status code is 404 and the resource name exist, add a descriptive 'not found' message.
-        if status == 404 and resource_name:
+        # If the status code is 404 and the resource name exist and the error message is 'Not found.',
+        # add a descriptive 'not found' message.
+        if status == 404 and resource_name and data['detail'] == 'Not found.':
             data['detail'] = f'{resource_name} does not exist.'
 
         # When the 'data' data type is a rest_framework.utils.serializer_helpers.ReturnList,
