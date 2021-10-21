@@ -23,10 +23,11 @@ class MembershipSerializer(serializers.ModelSerializer):
     is_owner = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
     group_name = serializers.SerializerMethodField()
+    group_token = serializers.SerializerMethodField()
 
     class Meta:
         model = Membership
-        fields = ('id', 'full_name', 'email', 'group_name', 'is_owner',
+        fields = ('id', 'full_name', 'email', 'group_name', 'group_token', 'is_owner',
                   'is_admin', 'group', 'user', 'created_at')
         read_only_fields = ('user', 'is_admin', 'is_owner', 'full_name',)
 
@@ -38,6 +39,9 @@ class MembershipSerializer(serializers.ModelSerializer):
 
     def get_group_name(self, obj):
         return obj.group.name if obj and obj.group else ''
+
+    def get_group_token(self, obj):
+        return obj.group.token if obj and obj.group else ''
 
     def get_is_owner(self, obj):
         return (obj and obj.user_id and obj.group_id and obj.group.owner_id and

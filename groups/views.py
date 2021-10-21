@@ -77,6 +77,21 @@ class MembershipViewSet(SuccessMessageMixin, ModelViewSet):
                 _('This user is already a member of this group.'))
 
     @action(methods=['POST'], detail=False)
+    def token(self, request, **kwargs):
+        try:
+            group = Group.objects.get(token=request.data['group_token'])
+            membership = Membership.objects.create(
+                user=request.user, group=group)
+            serializer = self.get_serializer(membership)
+        except Group.DoesNotExist:
+            raise NotFound(_('Group with this token does not exist.'))
+        except IntegrityError:
+            raise PermissionDenied(
+                _('This user is already a member of this group.'))
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(methods=['POST'], detail=False)
     def bulk_create(self, request, **kwargs):
         serializer = MembershipBulkSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
