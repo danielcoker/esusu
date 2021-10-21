@@ -39,15 +39,8 @@ class Membership(models.Model):
     group = models.ForeignKey(
         Group, on_delete=models.CASCADE, related_name='memberships')
     is_admin = models.BooleanField(default=False, null=False, blank=False)
-    created_at = models.DateField(
+    created_at = models.DateTimeField(
         auto_now_add=True, verbose_name=_('created at'))
 
     class Meta:
         unique_together = ('user', 'group',)
-
-    def clean(self):
-        memberships = Membership.objects.filter(
-            user=self.user, group=self.group)
-        if self.user and memberships.count() > 0:
-            raise ValidationError(
-                _('This user is already a member of this group.'))
