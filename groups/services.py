@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework.exceptions import NotFound
@@ -49,3 +51,15 @@ def create_members_from_bulk(bulk_data, **additional_fields):
     db.save_in_bulk(members)
 
     return members
+
+
+def get_cycle_end_date(start_date, member_count):
+    """
+    Get the end date of a cycle from its start date and the number of group members.
+
+    :param start_date: The cycle start date.
+    :param member_count: The number of members in the group.
+
+    :return: The cycle end date.
+    """
+    return start_date + timedelta(days=member_count*7)
