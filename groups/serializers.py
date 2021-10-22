@@ -1,12 +1,10 @@
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound
 
-from users.models import User
 from users.serializers import UserSerializer
 
-from .models import Group, Membership
+from .models import Group, Membership, Cycle
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -55,3 +53,14 @@ class _MembershipBulkSerializer(serializers.Serializer):
 class MembershipBulkSerializer(serializers.Serializer):
     group_id = serializers.IntegerField()
     bulk_memberships = _MembershipBulkSerializer(many=True)
+
+
+class CycleSerializer(serializers.ModelSerializer):
+    group = GroupSerializer(read_only=True)
+
+    class Meta:
+        model = Cycle
+        fields = ('cycle_number', 'start_date',
+                  'end_date', 'next_saving_date', 'group',)
+        read_only_fields = ('cycle_number', 'end_date',
+                            'next_saving_date', 'group',)

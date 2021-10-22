@@ -1,4 +1,5 @@
 import secrets
+from datetime import datetime
 
 from django.db import IntegrityError
 from django.utils.translation import gettext_lazy as _
@@ -9,16 +10,16 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.viewsets import ModelViewSet, ViewSet
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from django_pglocks import advisory_lock
 
 from base.mixins import SuccessMessageMixin
 from base.permissions import IsOwnerOrReadOnly
 
-from .models import Group, Membership
-from .serializers import GroupSerializer, MembershipSerializer, MembershipBulkSerializer
+from .models import Cycle, Group, Membership
+from .serializers import GroupSerializer, MembershipSerializer, MembershipBulkSerializer, CycleSerializer
 from . import services
 
 
@@ -108,3 +109,37 @@ class MembershipViewSet(SuccessMessageMixin, ModelViewSet):
         members_serialized = MembershipSerializer(members, many=True)
 
         return Response(members_serialized.data, status=status.HTTP_201_CREATED)
+
+
+class CycleViewSet(SuccessMessageMixin, ViewSet):
+    serializer_class = CycleSerializer
+    permission_classes = (IsAuthenticated,)
+    resource_name = 'Cycle'
+
+    @action(methods=['POST'], detail=False)
+    def set(self, request, **kwargs):
+        current_cycle_number = 1
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            group = Group.objects.get(id=request.data['group'])
+            cycle = Cycle.objects.filter(
+                group=group).order_by('-cycle_number').first()
+
+            # If the cycle date is a null value or the current date is before than the end date.
+            if cycle and (not cycle.end_date or datetime.now().date() < cycle.end_date):
+                raise PermissionDenied(
+                    _('Cannot create another cycle during an ongoing cycle.'))
+
+            # If a cycle exists, increment the cycle number by 1
+            if cycle:
+                current_cycle_number = cycle.cycle_number + 1
+
+        except Group.DoesNotExist:
+            raise NotFound(_('Group does not exist.'))
+
+        serializer.save(
+            group=group, cycle_number=current_cycle_number)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

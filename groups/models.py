@@ -45,3 +45,15 @@ class Membership(models.Model):
     class Meta:
         unique_together = ('user', 'group',)
         ordering = ['-created_at']
+
+
+class Cycle(models.Model):
+    cycle_number = models.IntegerField(
+        blank=True, null=True, verbose_name=_('cycle number'))
+    start_date = models.DateField(verbose_name=_('start date'))
+    end_date = models.DateField(
+        blank=True, null=True, verbose_name=_('end date'))
+    next_saving_date = models.DateField(
+        blank=True, null=True, verbose_name=_('next saving date'))
+    group = models.ForeignKey(
+        Group, on_delete=models.CASCADE, related_name='cycles')
