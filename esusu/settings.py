@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'users',
     'authentication',
     'groups',
+    'transactions',
 ]
 
 MIDDLEWARE = [
