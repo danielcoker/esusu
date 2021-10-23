@@ -35,3 +35,13 @@ class Paystack():
             'https://api.paystack.co/transferrecipient', data=kwargs, headers=self.auth_header)
 
         return json.loads(response.content)
+
+    def verify_transaction(self, reference):
+        """
+        Confirm the status of a transaction.
+        https://paystack.com/docs/api/#transaction-verify
+        """
+        response = self.request.get(
+            f'https://api.paystack.co/transaction/verify/{reference}', headers=self.auth_header)
+
+        return json.loads(response.content)
