@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 
 from users.serializers import UserSerializer
 
-from .models import Bank
+from .models import Bank, Card
 from .services import Paystack
 
 
@@ -59,3 +59,25 @@ class BankSerializer(serializers.ModelSerializer):
         attrs['bank_name'] = response_data['details']['bank_name']
 
         return attrs
+
+
+class CardSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Card
+        fields = '__all__'
+
+    def create(self, validated_data):
+        authorization_code = validated_data['authorization_code']
+        last4 = validated_data['last4']
+        user = validated_data['user']
+
+        card, created = Card.objects.update_or_create(
+            authorization_code=authorization_code, last4=last4, user=user, defaults=validated_data)
+
+        return card
+
+
+class VerifyPaymentSerializer(serializers.Serializer):
+    reference = serializers.CharField(max_length=255, required=True)
