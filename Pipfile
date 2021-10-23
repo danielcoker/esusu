@@ -14,6 +14,7 @@ factory-boy = "==2.11.1"
 pytest-django = "*"
 django-money = "==2.1"
 django-pglocks = "*"
+requests = "==2.26.0"
 
 [dev-packages]
 autopep8 = "*"
