@@ -60,7 +60,7 @@ class CardViewSet(SuccessMessageMixin, ModelViewSet):
             raise ValidationError(_('Unable to save card.'))
 
         serializer = self.get_serializer(
-            data=response_data['authorization'])
+            data={**response_data['authorization'], 'reference': reference})
         serializer.is_valid(raise_exception=True)
 
         serializer.save(user=request.user)

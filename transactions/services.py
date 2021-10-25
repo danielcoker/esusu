@@ -45,3 +45,13 @@ class Paystack():
             f'https://api.paystack.co/transaction/verify/{reference}', headers=self.auth_header)
 
         return json.loads(response.content)
+
+    def create_refund(self, reference):
+        """
+        Initiate a refund to a customer directly.
+        https://paystack.com/docs/payments/refunds/#creating-a-refund
+        """
+        data = {'transaction': reference}
+
+        self.request.post(
+            'https://api.paystack.co/refund', data=data, headers=self.auth_header)
