@@ -24,6 +24,8 @@ class Bank(TimestampedModel):
 
 
 class Card(TimestampedModel):
+    reference = models.CharField(
+        max_length=255, verbose_name=_('transaction reference'))
     authorization_code = models.CharField(
         max_length=255, verbose_name=_('authorization code'))
     card_type = models.CharField(max_length=128, verbose_name=_('card type'))
