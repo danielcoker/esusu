@@ -69,12 +69,14 @@ class CardSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        authorization_code = validated_data['authorization_code']
+        signature = validated_data['signature']
+        exp_month = validated_data['exp_month']
+        exp_year = validated_data['exp_year']
         last4 = validated_data['last4']
         user = validated_data['user']
 
         card, created = Card.objects.update_or_create(
-            authorization_code=authorization_code, last4=last4, user=user, defaults=validated_data)
+            signature=signature, exp_month=exp_month, exp_year=exp_year, last4=last4, user=user, defaults=validated_data)
 
         return card
 
