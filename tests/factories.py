@@ -40,3 +40,16 @@ class MembershipFactory(Factory):
     user = factory.SubFactory('tests.factories.UserFactory')
     group = factory.SubFactory('tests.factories.GroupFactory')
     is_admin = False
+
+
+class BankFactory(Factory):
+    class Meta:
+        model = 'transactions.Bank'
+
+    account_name = factory.Faker('name')
+    account_number = '0000000000'
+    bank_code = '011'
+    bank_name = 'First Bank of Nigeria'
+    transfer_recipient = factory.Sequence(lambda n: f'RCP_t0ya41mp35flk4{n}.')
+    is_default = False
+    user = factory.SubFactory('tests.factories.UserFactory')
