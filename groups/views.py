@@ -142,4 +142,4 @@ class CycleViewSet(SuccessMessageMixin, ViewSet):
         serializer.save(
             group=group, cycle_number=current_cycle_number)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
