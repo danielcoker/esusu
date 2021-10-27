@@ -34,7 +34,7 @@ def set_end_date_for_membership(membership_instance):
         end_date = get_cycle_end_date(
             cycle[0].start_date, memberships.count())
 
-    cycle.update(end_date=end_date)
+        cycle.update(end_date=end_date)
 
 
 def membership_post_save(sender, instance, created, **kwargs):
