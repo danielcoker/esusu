@@ -60,7 +60,7 @@ class CycleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cycle
-        fields = ('cycle_number', 'start_date',
+        fields = ('id', 'cycle_number', 'start_date',
                   'end_date', 'next_saving_date', 'group',)
         read_only_fields = ('cycle_number', 'end_date',
                             'next_saving_date', 'group',)
