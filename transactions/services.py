@@ -7,7 +7,9 @@ from .models import PaymentList
 
 
 def generate_payment_list(**kwargs):
-    # Shuffle memberships list.
+    """
+    Shuffle membership list and generate a payment list schedule for members.
+    """
     random.shuffle(kwargs['memberships'])
 
     next_payment_date = datetime.strptime(kwargs['start_date'], '%Y-%m-%d') + \
