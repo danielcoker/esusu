@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import status
-from rest_framework.decorators import action, permission_classes
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
@@ -15,8 +15,8 @@ from base.permissions import IsOwner
 from base.mixins import SuccessMessageMixin
 from groups.models import Cycle, Group, Membership
 
-from .models import Bank, Card, SavingsList, Transaction
 from .utils import Paystack
+from .models import Bank, Card, PaymentList, SavingsList, Transaction
 from .serializers import BankSerializer, CardSerializer, VerifyPaymentSerializer
 
 
@@ -105,7 +105,7 @@ class TransactionViewset(SuccessMessageMixin, ViewSet):
                 type = 'savings'
                 transaction_status = response_data['status']
 
-                # Save to transaction.
+                # Save transaction.
                 transaction = Transaction.objects.create(
                     amount=amount, reference=reference, type=type, status=transaction_status, user=card.user)
 
@@ -122,6 +122,61 @@ class TransactionViewset(SuccessMessageMixin, ViewSet):
 
         cycles.update(next_saving_date=next_saving_date)
 
-        self.success_message = 'Savings operation completed successfully.'
+        self.success_message = _('Savings operation completed successfully.')
+
+        return Response(status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False)
+    def pay(self, request, **kwargs):
+        # Fetch all users that has their payment date as today.
+        payments = PaymentList.objects.select_related('group').filter(
+            payment_date=datetime.now().date())
+
+        for payment in payments:
+
+            # If the transaction field on the payment exist,
+            # skip the iteration because a payment has already been attempted.
+            if payment.transaction:
+                continue
+
+            try:
+                bank = Bank.objects.get(user=payment.user)
+
+                # Calculate amount to pay.
+                # Amount to pay is the amount saved multiplied by the number of group members.
+                membership_count = Membership.objects.filter(
+                    group=payment.group).count()
+                amount_to_pay = int(
+                    Decimal(payment.group.amount_to_save.amount)) * membership_count * 100
+
+                # Initiate transfer.
+                paystack = Paystack()
+                response = paystack.initiate_transfer(
+                    bank.transfer_recipient, amount_to_pay)
+
+                # If the paystack request was not successful for any reason,
+                # skip to the next iteration.
+                # @TODO: Log failed transfers and reason for failure.
+                if not response['status']:
+                    continue
+
+                response_data = response['data']
+
+                amount = response_data['amount'] / 100
+                reference = response_data['reference']
+                type = 'payment'
+                transaction_status = response_data['status']
+
+                # Save transaction.
+                transaction = Transaction.objects.create(
+                    amount=amount, reference=reference, type=type, status=transaction_status, user=bank.user)
+
+                # Update payment list with transaction.
+                payment.transaction = transaction
+                payment.save()
+            except Bank.DoesNotExist:
+                pass
+
+        self.success_message = _('Payment operation completed successfully.')
 
         return Response(status=status.HTTP_200_OK)
