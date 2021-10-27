@@ -11,7 +11,7 @@ from base.permissions import IsOwner
 from base.mixins import SuccessMessageMixin
 
 from .models import Bank, Card
-from .services import Paystack
+from .utils import Paystack
 from .serializers import BankSerializer, CardSerializer, VerifyPaymentSerializer
 
 

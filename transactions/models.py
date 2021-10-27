@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from base.models import TimestampedModel
+from groups.models import Group, Cycle
 
 
 class Bank(TimestampedModel):
@@ -46,3 +47,21 @@ class Card(TimestampedModel):
 
     def __str__(self):
         return self.bank
+
+
+class PaymentList(TimestampedModel):
+    order = models.IntegerField(verbose_name=_('order'))
+    group = models.ForeignKey(
+        Group, on_delete=models.CASCADE, related_name='payment_lists')
+    cycle = models.ForeignKey(
+        Cycle, on_delete=models.CASCADE, related_name='payment_lists')
+    payment_date = models.DateField(
+        blank=True, null=True, verbose_name=_('payment date'))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE, related_name='payment_lists')
+
+    class Meta:
+        ordering = ('order',)
+
+    def __str__(self):
+        return self.order

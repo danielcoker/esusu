@@ -17,6 +17,7 @@ from django_pglocks import advisory_lock
 
 from base.mixins import SuccessMessageMixin
 from base.permissions import IsOwnerOrReadOnly
+from transactions.services import generate_payment_list
 
 from .models import Cycle, Group, Membership
 from .serializers import GroupSerializer, MembershipSerializer, MembershipBulkSerializer, CycleSerializer
@@ -127,7 +128,7 @@ class CycleViewSet(SuccessMessageMixin, ViewSet):
             cycle = Cycle.objects.filter(
                 group=group).order_by('-cycle_number').first()
 
-            # If the cycle date is a null value or the current date is before than the end date.
+            # If the cycle date is a null value or the current date is before the end date.
             if cycle and (not cycle.end_date or datetime.now().date() < cycle.end_date):
                 raise PermissionDenied(
                     _('Cannot create another cycle during an ongoing cycle.'))
@@ -141,5 +142,12 @@ class CycleViewSet(SuccessMessageMixin, ViewSet):
 
         serializer.save(
             group=group, cycle_number=current_cycle_number)
+
+        # Fetch all the member in the group.
+        memberships = Membership.objects.filter(group=group)[::1]
+        cycle = Cycle.objects.get(id=serializer.data['id'])
+
+        generate_payment_list(
+            start_date=serializer.data['start_date'], group=group, cycle=cycle, memberships=memberships)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

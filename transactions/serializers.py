@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 from users.serializers import UserSerializer
 
 from .models import Bank, Card
-from .services import Paystack
+from .utils import Paystack
 
 
 class BankSerializer(serializers.ModelSerializer):
