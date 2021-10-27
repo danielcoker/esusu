@@ -17,7 +17,7 @@ from django_pglocks import advisory_lock
 
 from base.mixins import SuccessMessageMixin
 from base.permissions import IsOwnerOrReadOnly
-from transactions.services import generate_payment_list
+from transactions.services import generate_payment_list, append_member_to_payment_list
 
 from .models import Cycle, Group, Membership
 from .serializers import GroupSerializer, MembershipSerializer, MembershipBulkSerializer, CycleSerializer
@@ -75,6 +75,16 @@ class MembershipViewSet(SuccessMessageMixin, ModelViewSet):
     def perform_create(self, serializer):
         try:
             serializer.save(user=self.request.user)
+
+            # Append user to a payment list after saving membership.
+            group = Group.objects.get(id=serializer.data['group'])
+            cycle = Cycle.objects.filter(
+                group=group, cycle_number=group.current_cycle).first()
+
+            if cycle:
+                append_member_to_payment_list(
+                    group=group, cycle=cycle, user=self.request.user)
+
         except IntegrityError:
             raise PermissionDenied(
                 _('This user is already a member of this group.'))
