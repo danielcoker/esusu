@@ -9,6 +9,12 @@ from .models import PaymentList
 def generate_payment_list(**kwargs):
     """
     Shuffle membership list and generate a payment list schedule for members.
+
+    Kwargs Content:
+    - memberships
+    - group
+    - cycle
+    - start_date
     """
     random.shuffle(kwargs['memberships'])
 
