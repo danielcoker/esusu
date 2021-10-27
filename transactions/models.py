@@ -97,6 +97,8 @@ class PaymentList(TimestampedModel):
         Cycle, on_delete=models.CASCADE, related_name='payment_list')
     payment_date = models.DateField(
         blank=True, null=True, verbose_name=_('payment date'))
+    transaction = models.ForeignKey(
+        Transaction, blank=True, null=True, on_delete=models.CASCADE, related_name='payment_list')
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE, related_name='payment_list')
 
@@ -104,7 +106,7 @@ class PaymentList(TimestampedModel):
         ordering = ('order',)
 
     def __str__(self):
-        return self.order
+        return str(self.payment_date)
 
 
 class SavingsList(TimestampedModel):
