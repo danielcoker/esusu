@@ -70,3 +70,28 @@ class Paystack():
             'https://api.paystack.co/transaction/charge_authorization', data=data, headers=self.auth_header)
 
         return json.loads(response.content)
+
+    def bulk_transfers(self, transfers):
+        """
+        Pay multiple recipients at once with Paystack bulk transfer feature.
+        https://paystack.com/docs/transfers/bulk-transfers/
+        """
+        data = {'currency': 'NGN', 'source': 'balance', 'transfers': transfers}
+
+        response = self.request.post(
+            'https://api.paystack.co/transfer/bulk', data=data, headers=self.auth_header)
+
+        return json.loads(response.content)
+
+    def initiate_transfer(self, recipient, amount):
+        """
+        Initiate a funds transfer.
+        https://paystack.com/docs/transfers/single-transfers#initiate-a-transfer
+        """
+        data = {'currency': 'NGN', 'source': 'balance',
+                'recipient': recipient, 'amount': amount}
+
+        response = self.request.post(
+            'https://api.paystack.co/transfer', data=data, headers=self.auth_header)
+
+        return json.loads(response.content)
