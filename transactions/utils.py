@@ -53,5 +53,20 @@ class Paystack():
         """
         data = {'transaction': reference}
 
-        self.request.post(
+        response = self.request.post(
             'https://api.paystack.co/refund', data=data, headers=self.auth_header)
+
+        return json.loads(response.content)
+
+    def charge_authorization(self, authorization_code, email, amount):
+        """
+        Charge authorization.
+        https://paystack.com/docs/payments/recurring-charges/#charge-the-authorization
+        """
+        data = {'authorization_code': authorization_code,
+                'email': email, 'amount': amount*10}
+
+        response = self.request.post(
+            'https://api.paystack.co/transaction/charge_authorization', data=data, headers=self.auth_header)
+
+        return json.loads(response.content)

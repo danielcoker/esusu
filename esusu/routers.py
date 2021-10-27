@@ -2,7 +2,7 @@ from rest_framework import routers
 
 from authentication.views import AuthViewSet
 from groups.views import CycleViewSet, GroupViewSet, MembershipViewSet
-from transactions.views import BankViewset, CardViewSet
+from transactions.views import BankViewset, CardViewSet, TransactionViewset
 
 router = routers.DefaultRouter(trailing_slash=False)
 
@@ -17,3 +17,4 @@ router.register(r'cycles', CycleViewSet, basename='cycles')
 # Transaction Routes
 router.register(r'banks', BankViewset, basename='banks')
 router.register(r'cards', CardViewSet, basename='cards')
+router.register(r'transactions', TransactionViewset, basename='transactions')
