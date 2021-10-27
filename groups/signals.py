@@ -30,8 +30,9 @@ def set_end_date_for_membership(membership_instance):
     cycle = Cycle.objects.filter(group=membership_instance.group.id,
                                  cycle_number=membership_instance.group.current_cycle)
 
-    end_date = get_cycle_end_date(
-        cycle[0].start_date, memberships.count())
+    if (len(cycle) > 0):
+        end_date = get_cycle_end_date(
+            cycle[0].start_date, memberships.count())
 
     cycle.update(end_date=end_date)
 
