@@ -17,6 +17,7 @@ from django_pglocks import advisory_lock
 
 from base.mixins import SuccessMessageMixin
 from base.permissions import IsOwnerOrReadOnly
+from transactions.models import PaymentList
 from transactions.services import generate_payment_list, append_member_to_payment_list
 
 from .models import Cycle, Group, Membership
@@ -70,6 +71,9 @@ class MembershipViewSet(SuccessMessageMixin, ModelViewSet):
             group = self.request.query_params.get('group')
             qs = qs.filter(group=group)
 
+        if self.action == 'destroy':
+            qs = qs.select_related('group')
+
         return qs
 
     def perform_create(self, serializer):
@@ -88,6 +92,16 @@ class MembershipViewSet(SuccessMessageMixin, ModelViewSet):
         except IntegrityError:
             raise PermissionDenied(
                 _('This user is already a member of this group.'))
+
+    def perform_destroy(self, instance):
+        cycle = Cycle.objects.filter(
+            group=instance.group, cycle_number=instance.group.current_cycle).first()
+
+        payment_list = PaymentList.objects.get(
+            cycle=cycle, group=instance.group, user=self.request.user)
+        payment_list.delete()
+
+        return super().perform_destroy(instance)
 
     @action(methods=['POST'], detail=False)
     def token(self, request, **kwargs):
