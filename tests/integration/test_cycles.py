@@ -47,3 +47,22 @@ def test_set_cycle_start_date(client):
 
     # Assert that the end date is updated appropriately.
     assert response_data['end_date'] == expected_end_date.strftime('%Y-%m-%d')
+
+
+def test_cannot_set_cycle_date_during_running_cycle(client):
+    user = f.UserFactory()
+    group = f.GroupFactory(owner=user)
+    f.MembershipFactory(group=group, user=user)
+    f.MembershipFactory(group=group)
+    f.MembershipFactory(group=group)
+    url = reverse('cycles-set')
+    data = {
+        'start_date': datetime.now().date(),
+        'group': group.id
+    }
+
+    client.login(user)
+    response = client.post(url, data)
+    response = client.post(url, data)
+
+    assert response.status_code == 403
