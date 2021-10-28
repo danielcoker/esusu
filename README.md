@@ -1,5 +1,7 @@
 # Esusu
 
+![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/danielcoker/esusu/django) ![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/danielcoker/esusu/djangorestframework)
+
 A corporative society app that allows users to save a fixed amount automatically every week, with the money collected by one of the members at the end of each month.
 
 ## API Documentation
