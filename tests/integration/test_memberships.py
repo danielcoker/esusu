@@ -38,6 +38,19 @@ def test_create_membership_by_token(client):
     assert response.status_code == 201
 
 
+def test_cannot_create_membership_for_filled_group(client):
+    group = f.GroupFactory(max_capacity=0)
+    user = f.UserFactory()
+    data = {'group': group.id}
+
+    url = reverse('memberships-list')
+
+    client.login(user)
+    response = client.post(url, data)
+
+    assert response.status_code == 403
+
+
 def test_bulk_create_membership(client):
     group = f.GroupFactory()
     user1 = f.UserFactory()

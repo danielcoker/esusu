@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 
 from users.serializers import UserSerializer
 
@@ -28,6 +29,14 @@ class MembershipSerializer(serializers.ModelSerializer):
         fields = ('id', 'full_name', 'email', 'group_name', 'group_token', 'is_owner',
                   'is_admin', 'group', 'user', 'created_at')
         read_only_fields = ('user', 'is_admin', 'is_owner', 'full_name',)
+
+    def validate(self, attrs):
+        group = Group.objects.prefetch_related(
+            'memberships').get(id=attrs['group'].id)
+        if group.memberships.count() >= group.max_capacity:
+            raise PermissionDenied('This group has reached its max capacity.')
+
+        return attrs
 
     def get_full_name(self, obj):
         return obj.user.get_full_name() if obj and obj.user else ''
