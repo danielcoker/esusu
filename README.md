@@ -25,7 +25,7 @@ These instructions will get a local copy of the project up and running for devel
 - Fill in the details of the environment varibles.
 - Run `pipenv install` to install required packages.
 - Run `pipenv shell` to activate the virtual env.
-- Run `python manage.py migrate` to run migrate.
+- Run `python manage.py migrate` to run migrations.
 - Run `python manage.py runserver` to start the development server.
 
 > Create a secret key for the Django app here: https://djecrety.ir/
