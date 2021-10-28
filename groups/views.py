@@ -124,9 +124,12 @@ class MembershipViewSet(SuccessMessageMixin, ModelViewSet):
         cycle = Cycle.objects.filter(
             group=instance.group, cycle_number=instance.group.current_cycle).first()
 
-        payment_list = PaymentList.objects.get(
-            cycle=cycle, group=instance.group, user=self.request.user)
-        payment_list.delete()
+        try:
+            payment_list = PaymentList.objects.get(
+                cycle=cycle, group=instance.group, user=self.request.user)
+            payment_list.delete()
+        except PaymentList.DoesNotExist:
+            pass
 
         return super().perform_destroy(instance)
 
