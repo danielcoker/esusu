@@ -141,6 +141,15 @@ class CycleViewSet(SuccessMessageMixin, ViewSet):
     permission_classes = (IsAuthenticated,)
     resource_name = 'Cycle'
 
+    def retrieve(self, request, pk=None):
+        try:
+            instance = Cycle.objects.get(pk=pk)
+            serializer = self.serializer_class(instance)
+        except Cycle.DoesNotExist:
+            raise NotFound()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(methods=['POST'], detail=False)
     def set(self, request, **kwargs):
         current_cycle_number = 1
