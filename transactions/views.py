@@ -13,11 +13,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from base.permissions import IsOwner
 from base.mixins import SuccessMessageMixin
-from groups.models import Cycle, Group, Membership
+from groups.models import Cycle, Membership
 
 from .utils import Paystack
 from .models import Bank, Card, PaymentList, SavingsList, Transaction
-from .serializers import BankSerializer, CardSerializer, VerifyPaymentSerializer
+from .serializers import BankSerializer, CardSerializer, VerifyPaymentSerializer, WebhookSerializer
 
 
 class BankViewset(SuccessMessageMixin, ModelViewSet):
@@ -178,5 +178,21 @@ class TransactionViewset(SuccessMessageMixin, ViewSet):
                 pass
 
         self.success_message = _('Payment operation completed successfully.')
+
+        return Response(status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False)
+    def webhook(self, request, **kwargs):
+        serializer = WebhookSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        reference = serializer.data['data']['reference']
+        transaction_status = serializer.data['data']['status']
+
+        transaction = Transaction.objects.filter(reference=reference).first()
+
+        if transaction:
+            transaction.status = transaction_status
+            transaction.save()
 
         return Response(status=status.HTTP_200_OK)

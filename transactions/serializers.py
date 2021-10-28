@@ -83,3 +83,14 @@ class CardSerializer(serializers.ModelSerializer):
 
 class VerifyPaymentSerializer(serializers.Serializer):
     reference = serializers.CharField(max_length=255, required=True)
+
+
+class WebhookDataSerializer(serializers.Serializer):
+    amount = serializers.CharField(max_length=255, required=True)
+    reference = serializers.CharField(max_length=255, required=True)
+    status = serializers.CharField(max_length=255, required=True)
+
+
+class WebhookSerializer(serializers.Serializer):
+    event = serializers.CharField(max_length=255, required=True)
+    data = WebhookDataSerializer(source='*')
