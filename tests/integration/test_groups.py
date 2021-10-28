@@ -51,8 +51,17 @@ def test_create_group(client):
 
     client.login(user)
     response = client.post(url, data)
+    response_data = json.loads(response.content)['data']
 
     assert response.status_code == 201
+
+    # Assert that group owner is added to the group's members list.
+    url = f"{reverse('memberships-list')}?group={response_data['id']}"
+    response = client.get(url)
+    response_data = json.loads(response.content)['data']
+
+    assert response.status_code == 200
+    assert response_data[0]['user'] == user.id
 
 
 def test_search_groups(client):

@@ -36,6 +36,8 @@ class GroupViewSet(SuccessMessageMixin, ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user,
                         token=secrets.token_hex(10).upper())
+        Membership.objects.create(
+            user=self.request.user, group_id=serializer.data['id'], is_admin=True)
 
     def get_queryset(self):
         qs = super().get_queryset()
