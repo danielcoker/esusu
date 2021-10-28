@@ -34,7 +34,7 @@ These instructions will get a local copy of the project up and running for devel
 
 The applicaton uses `pytest` for testing.
 
-Run `pytest` to execute tests. <br>You can also add `--cov` to get test coverage report along with the test.
+Run `pytest` to execute tests. <br>You can also add `--cov` to get test coverage report along with the test results.
 
 ## Features
 
