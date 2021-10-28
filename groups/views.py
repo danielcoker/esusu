@@ -17,7 +17,8 @@ from django_pglocks import advisory_lock
 
 from base.mixins import SuccessMessageMixin
 from base.permissions import IsOwnerOrReadOnly
-from transactions.models import PaymentList
+from transactions.models import PaymentList, SavingsList
+from transactions.serializers import PaymentListSerializer, SavingsListSerializer
 from transactions.services import generate_payment_list, append_member_to_payment_list
 
 from .models import Cycle, Group, Membership
@@ -57,6 +58,32 @@ class GroupViewSet(SuccessMessageMixin, ModelViewSet):
     @action(methods=['GET'], detail=False, url_path='token/(?P<token>[^/.]+)')
     def token(self, request, token, pk=None):
         return self.retrieve(request, token=token)
+
+    @action(methods=['GET'], detail=True)
+    def savings(self, request, pk=None):
+        savings = SavingsList.objects.filter(group=pk)
+
+        cycle_number = request.query_params.get('cycle')
+        if cycle_number:
+            cycle = Cycle.objects.filter(cycle_number=cycle_number).first()
+            savings = savings.filter(cycle=cycle)
+
+        serializer = SavingsListSerializer(savings, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=True)
+    def payments(self, request, pk=None):
+        payments = PaymentList.objects.filter(group=pk)
+
+        cycle_number = request.query_params.get('cycle')
+        if cycle_number:
+            cycle = Cycle.objects.filter(cycle_number=cycle_number).first()
+            payments = payments.filter(cycle=cycle)
+
+        serializer = PaymentListSerializer(payments, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MembershipViewSet(SuccessMessageMixin, ModelViewSet):

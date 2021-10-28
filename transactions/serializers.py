@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
@@ -5,8 +6,9 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 
 
 from users.serializers import UserSerializer
+from groups.serializers import GroupSerializer, CycleSerializer
 
-from .models import Bank, Card
+from .models import Bank, Card, PaymentList, SavingsList, Transaction
 from .utils import Paystack
 
 
@@ -94,3 +96,33 @@ class WebhookDataSerializer(serializers.Serializer):
 class WebhookSerializer(serializers.Serializer):
     event = serializers.CharField(max_length=255, required=True)
     data = WebhookDataSerializer(source='*')
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Transaction
+        fields = ('id', 'reference', 'amount',
+                  'type', 'status', 'comments', 'user',)
+
+
+class SavingsListSerializer(serializers.ModelSerializer):
+    cycle = CycleSerializer()
+    transaction = TransactionSerializer()
+    user = UserSerializer()
+
+    class Meta:
+        model = SavingsList
+        fields = ('id', 'cycle', 'group', 'transaction', 'user',)
+
+
+class PaymentListSerializer(serializers.ModelSerializer):
+    cycle = CycleSerializer()
+    transaction = TransactionSerializer()
+    user = UserSerializer()
+
+    class Meta:
+        model = PaymentList
+        fields = ('id', 'order', 'cycle', 'group',
+                  'payment_date', 'transaction', 'user')
