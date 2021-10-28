@@ -64,7 +64,7 @@ To contribute to this project:
 
 ## Author
 
-Daniel Coker (https://twitter.com/danielcoker_)
+[Daniel Coker](https://twitter.com/danielcoker_)
 
 ## Licence
 
