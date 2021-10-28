@@ -26,13 +26,24 @@ def test_set_cycle_start_date(client):
 
     client.login(user)
     response = client.post(url, data)
+    cycle_id = json.loads(response.content)['data']['id']
 
+    # Assert that cycle was set successfully.
     assert response.status_code == 200
 
     url = reverse('groups-detail', kwargs={'pk': group.id})
     response = client.get(url)
     response_data = json.loads(response.content)['data']
 
+    # Assert that the current cycle on the group is updated.
     assert response_data['current_cycle'] == 1
 
-    # @TODO Hit get cycle endpoint to check end date is the correct date. (Correct Date: start_date + 3 weeks)
+    url = reverse('cycles-detail', kwargs={'pk': cycle_id})
+    response = client.get(url)
+    response_data = json.loads(response.content)['data']
+
+    expected_end_date = data['start_date'] + \
+        timedelta(days=21)
+
+    # Assert that the end date is updated appropriately.
+    assert response_data['end_date'] == expected_end_date.strftime('%Y-%m-%d')
