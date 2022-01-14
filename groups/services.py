@@ -47,7 +47,7 @@ def create_members_from_bulk(bulk_data, **additional_fields):
     :return: List of created `Member` instances.
     """
     members = get_members_from_bulk(bulk_data, **additional_fields)
-    # print(members)
+
     db.save_in_bulk(members)
 
     return members
