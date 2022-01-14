@@ -92,7 +92,7 @@ class TransactionViewset(SuccessMessageMixin, ViewSet):
                 # Convert amount to save to the integer value.
                 amount_to_save = int(
                     Decimal(cycle.group.amount_to_save.amount)) * 10
-                print(amount_to_save)
+
                 # Charge card
                 paystack = Paystack()
                 response = paystack.charge_authorization(
