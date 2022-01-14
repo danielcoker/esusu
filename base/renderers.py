@@ -8,7 +8,7 @@ class JSONRenderer(renderers.JSONRenderer):
         status = renderer_context.get('response').status_code
         success_message = renderer_context.get('success_message', None)
 
-        # Return an enpty body for responses with 204 status code.
+        # Return an empty body for responses with 204 status code.
         if status == 204:
             return super(JSONRenderer, self).render(
                 None, accepted_media_type, renderer_context)
